@@ -1,13 +1,128 @@
 <html>
     <head>
-        Welcome
+        <title>Alexa Voice Assistant</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #f0f0f0;
+                text-align: center;
+                padding: 20px;
+            }
+            h1 {
+                color: #007bff;
+            }
+            .container {
+                max-width: 600px;
+                margin: 0 auto;
+                background: white;
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            }
+            input[type="text"] {
+                width: 70%;
+                padding: 10px;
+                margin: 10px 0;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+            }
+            button {
+                padding: 10px 20px;
+                margin: 5px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+            .submit-btn {
+                background-color: #28a745;
+                color: white;
+            }
+            .mic-btn {
+                background-color: #dc3545;
+                color: white;
+            }
+            .response {
+                margin-top: 20px;
+                padding: 10px;
+                background-color: #e9ecef;
+                border-radius: 5px;
+                display: none;
+            }
+            .examples {
+                margin-top: 20px;
+                text-align: left;
+            }
+            .examples ul {
+                list-style-type: none;
+                padding: 0;
+            }
+            .examples li {
+                margin: 5px 0;
+                cursor: pointer;
+                color: #007bff;
+            }
+            .examples li:hover {
+                text-decoration: underline;
+            }
+        </style>
     </head>
     <body>
-        <h1>Alexa Voice Assistant</h1>
-        <form action="/command" method="post">
-            <label for="command">Enter your command:</label>
-            <input type="text" id="command" name="command" required>
-            <button type="submit">Submit</button>
-        </form>
+        <div class="container">
+            <h1>Alexa Voice Assistant</h1>
+            <p>Speak or type your command to interact with Alexa.</p>
+            <form action="/command" method="post">
+                <label for="command">Enter your command:</label>
+                <input type="text" id="command" name="command" required>
+                <br>
+                <button type="submit" class="submit-btn">Submit</button>
+                <button type="button" class="mic-btn" id="mic-btn">🎤 Speak</button>
+            </form>
+            <div class="response" id="response"></div>
+            <div class="examples">
+                <h3>Example Commands:</h3>
+                <ul>
+                    <li onclick="setCommand('What is the weather today?')">What is the weather today?</li>
+                    <li onclick="setCommand('Play some music')">Play some music</li>
+                    <li onclick="setCommand('Set a timer for 5 minutes')">Set a timer for 5 minutes</li>
+                    <li onclick="setCommand('Tell me a joke')">Tell me a joke</li>
+                    <li onclick="setCommand('What time is it?')">What time is it?</li>
+                </ul>
+            </div>
+        </div>
+        <script>
+            function setCommand(text) {
+                document.getElementById('command').value = text;
+            }
+
+            const micBtn = document.getElementById('mic-btn');
+            const commandInput = document.getElementById('command');
+            const responseDiv = document.getElementById('response');
+
+            micBtn.addEventListener('click', () => {
+                if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+                    recognition.lang = 'en-US';
+                    recognition.interimResults = false;
+                    recognition.maxAlternatives = 1;
+
+                    recognition.start();
+
+                    recognition.onresult = (event) => {
+                        const transcript = event.results[0][0].transcript;
+                        commandInput.value = transcript;
+                        responseDiv.style.display = 'block';
+                        responseDiv.textContent = 'You said: ' + transcript;
+                    };
+
+                    recognition.onerror = (event) => {
+                        responseDiv.style.display = 'block';
+                        responseDiv.textContent = 'Error occurred in recognition: ' + event.error;
+                    };
+                } else {
+                    responseDiv.style.display = 'block';
+                    responseDiv.textContent = 'Speech recognition not supported in this browser.';
+                }
+            });
+        </script>
     </body>
 </html>
